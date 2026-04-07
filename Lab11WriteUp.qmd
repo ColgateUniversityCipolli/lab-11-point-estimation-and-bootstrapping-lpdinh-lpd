@@ -389,6 +389,68 @@ ggplot(raw_binom) +
 ```
 
 * Normal
+
+```{r}
+set.seed(7272)
+
+S1_norm <- list()
+S2_norm <- list()
+
+for(n in ss){
+  S1 <- rep(NA, n.sims)
+  S2 <- rep(NA, n.sims)
+  for(i in 1:n.sims){
+    curr.sample <- curr.sample <- rnorm(n = n, mean = 0, sd = sqrt(2))
+    x_bar <- mean(curr.sample)
+    S1[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+    S2[i] <- sum((curr.sample - x_bar)^2) / n
+  }
+  S1_norm[[as.character(n)]] <- S1
+  S2_norm[[as.character(n)]] <- S2
+}
+
+# raw data 
+raw_norm <- tibble(
+  Estimator = rep(c("S1", "S2"), each = 1000, times = 4),
+  n = factor(rep(c("n=20", "n=50", "n=100", "n=500"), each = 2000),
+            levels = c("n=20", "n=50", "n=100", "n=500")),
+  Estimate = c(S1_norm[["20"]], S2_norm[["20"]],
+              S1_norm[["50"]], S2_norm[["50"]],
+              S1_norm[["100"]], S2_norm[["100"]],
+              S1_norm[["500"]], S2_norm[["500"]])
+)
+# summary 
+results_norm <- tibble(
+  n = rep(c(20, 50, 100, 500), each=2),
+  Estimator = rep(c("S1", "S2"), times = 4),
+  Bias = c(
+    mean(S1_norm[["20"]]) - 2, mean(S2_norm[["20"]]) - 2,
+    mean(S1_norm[["50"]]) - 2, mean(S2_norm[["50"]]) - 2,
+    mean(S1_norm[["100"]]) - 2, mean(S2_norm[["100"]]) - 2,
+    mean(S1_norm[["500"]]) - 2, mean(S2_norm[["500"]]) - 2
+  ),
+  Variance = c(
+    var(S1_norm[["20"]]),  var(S2_norm[["20"]]),
+    var(S1_norm[["50"]]),  var(S2_norm[["50"]]),
+    var(S1_norm[["100"]]), var(S2_norm[["100"]]),
+    var(S1_norm[["500"]]), var(S2_norm[["500"]])
+  ),
+  Precision = 1 / Variance,
+  MSE = Bias^2 + Variance)
+
+# table
+results_norm |> knitr::kable(digits = 2)
+
+# plot
+ggplot(raw_norm) +
+  geom_boxplot(aes(x = Estimator,
+                   y= Estimate),
+               width = 0.1) +
+  ggtitle("S1 vs S2 from 1000 simulations across sample size") +
+  theme(axis.ticks.x = element_blank()) +
+  facet_wrap(~ n) 
+```
+
 * Exponential
 
 ## Simulation
