@@ -191,33 +191,59 @@ results.S1 <- tibble(
   )
 )
 
-results.S2 <- tibble(
-  Distribution = c("Poisson", "Binomial", "Normal", "Exponential"),
+results <- tibble(
+  Distribution = rep(c("Poisson", "Binomial", "Normal", "Exponential"), each = 2),
+  Estimator = rep(c("S1", "S2"), times = 4),
   Bias = c(
-    mean(S2_pois) - 2,
-    mean(S2_bin) - 2,
-    mean(S2_norm) - 2,
-    mean(S2_exp) - 2
+    mean(S1_pois) - 2, mean(S2_pois) - 2,
+    mean(S1_bin)  - 2, mean(S2_bin)  - 2,
+    mean(S1_norm) - 2, mean(S2_norm) - 2,
+    mean(S1_exp)  - 2, mean(S2_exp)  - 2
   ),
   Variance = c(
-    var(S2_pois),
-    var(S2_bin),
-    var(S2_norm),
-    var(S2_exp)
+    var(S1_pois), var(S2_pois),
+    var(S1_bin),  var(S2_bin),
+    var(S1_norm), var(S2_norm),
+    var(S1_exp),  var(S2_exp)
   ),
-  Precision = c(
-    1/var(S2_pois),
-    1/var(S2_bin),
-    1/var(S2_norm),
-    1/var(S2_exp)
-  ),
-  MSE = c(
-    (mean(S2_pois) - 2)^2 + var(S1_pois),
-    (mean(S2_bin) - 2)^2 + var(S1_bin),
-    (mean(S2_norm) - 2)^2 + var(S1_norm),
-    (mean(S2_exp) - 2)^2 + var(S1_exp)
-  )
+  Precision = 1 / Variance,
+  MSE = Bias^2 + Variance
 )
+```
+
+```{r}
+ggplot(results, aes(x = Estimator, y = Bias, fill = Estimator)) +
+  geom_col() +
+  facet_wrap(~ Distribution) +
+  labs(title = "Bias")
+
+ggplot(results, aes(x = Estimator, y = Precision, fill = Estimator)) +
+  geom_col() +
+  facet_wrap(~ Distribution) +
+  labs(title = "Precision")
+
+ggplot(results, aes(x = Estimator, y = MSE, fill = Estimator)) +
+  geom_col() +
+  facet_wrap(~ Distribution) +
+  labs(title = "MSE")
+```
+
+```{r}
+raw <- tibble(
+  Estimator= rep(c("S1", "S2"), each = 1000, times = 4),
+  Distribution= rep(c("Poisson", "Binomial", "Normal", "Exponential"), 
+                   each = 2000),
+  Estimate=c(S1_pois, S2_pois, S1_bin, S2_bin, 
+              S1_norm, S2_norm, S1_exp, S2_exp)
+)
+
+ggplot(raw) +
+  geom_boxplot(aes(x = Estimator,
+                   y= Estimate),
+               width = 0.1) +
+  ggtitle("Distribution of S1 vs S2 across 1000 simulations") +
+  theme(axis.ticks.x = element_blank()) +
+  facet_wrap(~ Distribution) 
 ```
 
 ## Simulation over various sample sizes
