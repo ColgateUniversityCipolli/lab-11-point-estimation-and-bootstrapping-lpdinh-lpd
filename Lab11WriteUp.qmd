@@ -105,6 +105,121 @@ Create a plot or combination of plots (using patchwork) to show the results acro
 \textrm{Mean Square Error} &= \textrm{Bias}^2 + \textrm{Variance of Estimates}.
 \end{align*}
 
+**Solution**
+
+```{r}
+set.seed(7272)
+
+n.sims <- 1000
+# sample size is 20
+n <- 20
+
+# Poisson
+S1_pois <- rep(NA, n.sims)
+S2_pois <- rep(NA, n.sims)
+
+for(i in 1:n.sims){
+  curr.sample <- rpois(n=n, lambda = 2)
+  x_bar = mean(curr.sample)
+  # don't need for (i in 1:n){Xi <- curr.sample[i] S1[i] <- (1/(n - 1)) * sum((Xi - x_bar)^2) S2[i] <- 1/n * sum((Xi - x_bar)^2)}, because it's vectorized.
+  S1_pois[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_pois[i] <- sum((curr.sample - x_bar)^2) / n
+  }
+
+# Binomial
+p <- (5-sqrt(21))/10
+
+S1_bin <- rep(NA, n.sims)
+S2_bin <- rep(NA, n.sims)
+
+for(i in 1:n.sims){
+  curr.sample <- rbinom(n = n, size = 50, prob = p)
+  x_bar <- mean(curr.sample)
+  S1_bin[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_bin[i] <- sum((curr.sample - x_bar)^2) / n
+}
+
+# Normal
+S1_norm <- rep(NA, n.sims)
+S2_norm <- rep(NA, n.sims)
+
+for(i in 1:n.sims){
+  curr.sample <- rnorm(n = n, mean = 0, sd = sqrt(2))
+  x_bar <- mean(curr.sample)
+  S1_norm[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_norm[i] <- sum((curr.sample - x_bar)^2) / n
+}
+
+# Exponential
+S1_exp <- rep(NA, n.sims)
+S2_exp <- rep(NA, n.sims)
+
+for(i in 1:n.sims){
+  curr.sample <- rexp(n = n, rate = 1/sqrt(2))
+  x_bar <- mean(curr.sample)
+  S1_exp[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_exp[i] <- sum((curr.sample - x_bar)^2) / n
+}
+```
+
+```{r}
+results.S1 <- tibble(
+  Distribution = c("Poisson", "Binomial", "Normal", "Exponential"),
+  Bias = c(
+    mean(S1_pois) - 2,
+    mean(S1_bin) - 2,
+    mean(S1_norm) - 2,
+    mean(S1_exp) - 2
+  ),
+  Variance = c(
+    var(S1_pois),
+    var(S1_bin),
+    var(S1_norm),
+    var(S1_exp)
+  ),
+  Precision = c(
+    1/var(S1_pois),
+    1/var(S1_bin),
+    1/var(S1_norm),
+    1/var(S1_exp)
+  ),
+  MSE = c(
+    (mean(S1_pois) - 2)^2 + var(S1_pois),
+    (mean(S1_bin) - 2)^2 + var(S1_bin),
+    (mean(S1_norm) - 2)^2 + var(S1_norm),
+    (mean(S1_exp) - 2)^2 + var(S1_exp)
+  )
+)
+
+results.S2 <- tibble(
+  Distribution = c("Poisson", "Binomial", "Normal", "Exponential"),
+  Bias = c(
+    mean(S2_pois) - 2,
+    mean(S2_bin) - 2,
+    mean(S2_norm) - 2,
+    mean(S2_exp) - 2
+  ),
+  Variance = c(
+    var(S2_pois),
+    var(S2_bin),
+    var(S2_norm),
+    var(S2_exp)
+  ),
+  Precision = c(
+    1/var(S2_pois),
+    1/var(S2_bin),
+    1/var(S2_norm),
+    1/var(S2_exp)
+  ),
+  MSE = c(
+    (mean(S2_pois) - 2)^2 + var(S1_pois),
+    (mean(S2_bin) - 2)^2 + var(S1_bin),
+    (mean(S2_norm) - 2)^2 + var(S1_norm),
+    (mean(S2_exp) - 2)^2 + var(S1_exp)
+  )
+)
+```
+
 ## Simulation over various sample sizes
 Consider the effect of the sample size have on these results. Provide a graphical and numerical summary of what happens as $n$ increases -- say $n=20$, $n=50$, $n=100$, and $n=500$. Does the result in your initial simulation hold across samples? Or, do things change as the sample size changes? Ensure to set your randomization seed.
  
