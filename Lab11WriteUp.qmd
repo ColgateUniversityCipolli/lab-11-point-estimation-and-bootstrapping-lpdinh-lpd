@@ -163,33 +163,51 @@ for(i in 1:n.sims){
 ```
 
 ```{r}
-results.S1 <- tibble(
-  Distribution = c("Poisson", "Binomial", "Normal", "Exponential"),
-  Bias = c(
-    mean(S1_pois) - 2,
-    mean(S1_bin) - 2,
-    mean(S1_norm) - 2,
-    mean(S1_exp) - 2
-  ),
-  Variance = c(
-    var(S1_pois),
-    var(S1_bin),
-    var(S1_norm),
-    var(S1_exp)
-  ),
-  Precision = c(
-    1/var(S1_pois),
-    1/var(S1_bin),
-    1/var(S1_norm),
-    1/var(S1_exp)
-  ),
-  MSE = c(
-    (mean(S1_pois) - 2)^2 + var(S1_pois),
-    (mean(S1_bin) - 2)^2 + var(S1_bin),
-    (mean(S1_norm) - 2)^2 + var(S1_norm),
-    (mean(S1_exp) - 2)^2 + var(S1_exp)
-  )
+raw <- tibble(
+  Estimator= rep(c("S1", "S2"), each = 1000, times = 4),
+  Distribution= rep(c("Poisson", "Binomial", "Normal", "Exponential"), 
+                   each = 2000),
+  Estimate=c(S1_pois, S2_pois, S1_bin, S2_bin, 
+              S1_norm, S2_norm, S1_exp, S2_exp)
 )
+
+ggplot(raw) +
+  geom_boxplot(aes(x = Estimator,
+                   y= Estimate),
+               width = 0.1) +
+  ggtitle("Distribution of S1 vs S2 across 1000 simulations") +
+  theme(axis.ticks.x = element_blank()) +
+  facet_wrap(~ Distribution) 
+```
+
+```{r}
+# results.S1 <- tibble(
+#   Distribution = c("Poisson", "Binomial", "Normal", "Exponential"),
+#   Bias = c(
+#     mean(S1_pois) - 2,
+#     mean(S1_bin) - 2,
+#     mean(S1_norm) - 2,
+#     mean(S1_exp) - 2
+#   ),
+#   Variance = c(
+#     var(S1_pois),
+#     var(S1_bin),
+#     var(S1_norm),
+#     var(S1_exp)
+#   ),
+#   Precision = c(
+#     1/var(S1_pois),
+#     1/var(S1_bin),
+#     1/var(S1_norm),
+#     1/var(S1_exp)
+#   ),
+#   MSE = c(
+#     (mean(S1_pois) - 2)^2 + var(S1_pois),
+#     (mean(S1_bin) - 2)^2 + var(S1_bin),
+#     (mean(S1_norm) - 2)^2 + var(S1_norm),
+#     (mean(S1_exp) - 2)^2 + var(S1_exp)
+#   )
+# )
 
 results <- tibble(
   Distribution = rep(c("Poisson", "Binomial", "Normal", "Exponential"), each = 2),
@@ -212,42 +230,87 @@ results <- tibble(
 ```
 
 ```{r}
-ggplot(results, aes(x = Estimator, y = Bias, fill = Estimator)) +
-  geom_col() +
-  facet_wrap(~ Distribution) +
-  labs(title = "Bias")
+# ggplot(results, aes(x = Estimator, y = Bias, fill = Estimator)) +
+#   geom_col() +
+#   facet_wrap(~ Distribution) +
+#   labs(title = "Bias")
 
-ggplot(results, aes(x = Estimator, y = Precision, fill = Estimator)) +
-  geom_col() +
-  facet_wrap(~ Distribution) +
-  labs(title = "Precision")
+# ggplot(results, aes(x = Estimator, y = Precision, fill = Estimator)) +
+#   geom_col() +
+#   facet_wrap(~ Distribution) +
+#   labs(title = "Precision")
 
-ggplot(results, aes(x = Estimator, y = MSE, fill = Estimator)) +
-  geom_col() +
-  facet_wrap(~ Distribution) +
-  labs(title = "MSE")
+# ggplot(results, aes(x = Estimator, y = MSE, fill = Estimator)) +
+#   geom_col() +
+#   facet_wrap(~ Distribution) +
+#   labs(title = "MSE")
 ```
 
 ```{r}
-raw <- tibble(
-  Estimator= rep(c("S1", "S2"), each = 1000, times = 4),
-  Distribution= rep(c("Poisson", "Binomial", "Normal", "Exponential"), 
-                   each = 2000),
-  Estimate=c(S1_pois, S2_pois, S1_bin, S2_bin, 
-              S1_norm, S2_norm, S1_exp, S2_exp)
-)
-
-ggplot(raw) +
-  geom_boxplot(aes(x = Estimator,
-                   y= Estimate),
-               width = 0.1) +
-  ggtitle("Distribution of S1 vs S2 across 1000 simulations") +
-  theme(axis.ticks.x = element_blank()) +
-  facet_wrap(~ Distribution) 
+#| echo: false
+results |> knitr::kable(digits = 2)
 ```
 
 ## Simulation over various sample sizes
 Consider the effect of the sample size have on these results. Provide a graphical and numerical summary of what happens as $n$ increases -- say $n=20$, $n=50$, $n=100$, and $n=500$. Does the result in your initial simulation hold across samples? Or, do things change as the sample size changes? Ensure to set your randomization seed.
+
+**Solution**
+Poisson
+
+```{r}
+set.seed(7272)
+
+n.sims <- 1000
+ss <- c(20, 50, 100, 500)
+
+S1_pois_n <- list()
+S2_pois_n <- list()
+
+for(n in ss){
+  S1 <- rep(NA, n.sims)
+  S2 <- rep(NA, n.sims)
+  for(i in 1:n.sims){
+    curr.sample <- rpois(n = n, lambda = 2)
+    x_bar <- mean(curr.sample)
+    S1[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+    S2[i] <- sum((curr.sample - x_bar)^2) / n
+  }
+  S1_pois_n[[as.character(n)]] <- S1
+  S2_pois_n[[as.character(n)]] <- S2
+}
+
+# raw data for boxplots
+raw_pois <- tibble(
+  Estimator= rep(c("S1", "S2"), each = 1000, times = 4),
+  n=rep(ss, each = 2000),
+  Estimate= c(S1_pois_n[["20"]],  S2_pois_n[["20"]],
+              S1_pois_n[["50"]],  S2_pois_n[["50"]],
+              S1_pois_n[["100"]], S2_pois_n[["100"]],
+              S1_pois_n[["500"]], S2_pois_n[["500"]])
+)
+# summary table
+results_pois <- tibble(
+  Samplesize = rep(c(20, 50, 100, 500), each=2),
+  Estimator = rep(c("S1", "S2"), times = 4),
+  Bias      = c(
+    mean(S1_pois_n[["20"]])  - 2, mean(S2_pois_n[["20"]])  - 2,
+    mean(S1_pois_n[["50"]])  - 2, mean(S2_pois_n[["50"]])  - 2,
+    mean(S1_pois_n[["100"]]) - 2, mean(S2_pois_n[["100"]]) - 2,
+    mean(S1_pois_n[["500"]]) - 2, mean(S2_pois_n[["500"]]) - 2
+  ),
+  Variance  = c(
+    var(S1_pois_n[["20"]]),  var(S2_pois_n[["20"]]),
+    var(S1_pois_n[["50"]]),  var(S2_pois_n[["50"]]),
+    var(S1_pois_n[["100"]]), var(S2_pois_n[["100"]]),
+    var(S1_pois_n[["500"]]), var(S2_pois_n[["500"]])
+  ),
+  Precision = 1 / Variance,
+  MSE       = Bias^2 + Variance)
+
+# table
+results_pois |> knitr::kable(digits = 2)
+```
+
  
 ## Simulation
 You have written code to draw a random sample of various sizes from each distribution, and to calculate and store the calculated estimates. Rework your code to produce a density plot of the $s_{n-1}^2$ and $s_{n}^2$. Do you have a guess about their distribution? Ensure to set your randomization seed. 
