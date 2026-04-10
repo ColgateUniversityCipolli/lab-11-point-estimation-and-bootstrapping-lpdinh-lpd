@@ -129,14 +129,14 @@ for(i in 1:n.sims){
 # Binomial
 p <- (5-sqrt(21))/10
 
-S1_bin <- rep(NA, n.sims)
-S2_bin <- rep(NA, n.sims)
+S1_binom <- rep(NA, n.sims)
+S2_binom <- rep(NA, n.sims)
 
 for(i in 1:n.sims){
   curr.sample <- rbinom(n = n, size = 50, prob = p)
   x_bar <- mean(curr.sample)
-  S1_bin[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
-  S2_bin[i] <- sum((curr.sample - x_bar)^2) / n
+  S1_binom[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_binom[i] <- sum((curr.sample - x_bar)^2) / n
 }
 
 # Normal
@@ -167,7 +167,7 @@ raw <- tibble(
   Estimator= rep(c("S1", "S2"), each = 1000, times = 4),
   Distribution= rep(c("Poisson", "Binomial", "Normal", "Exponential"), 
                    each = 2000),
-  Estimate=c(S1_pois, S2_pois, S1_bin, S2_bin, 
+  Estimate=c(S1_pois, S2_pois, S1_binom, S2_binom, 
               S1_norm, S2_norm, S1_exp, S2_exp)
 )
 
@@ -658,9 +658,173 @@ ggplot(raw_pois) +
   theme_bw()
 ```
 
-
 ## Bootstrap
 Now, take *one* sample from each distribution. Instead of drawing a random sample at each iteration, sample *with replacement* from the one sample. Produce a density plot of the $s_{n-1}^2$ and $s_{n}^2$. Do we get roughly the same information as we do in the full simulation? Try this over several seeds -- what do you notice? Ensure to set your randomization seed.
+
+```{r}
+set.seed(7272)
+
+# draw 1 sample from each distribution
+one_pois <- rpois(n = n, lambda = 2)
+one_binom <- rbinom(n = n, size = 50, prob = p)
+one_norm <- rnorm(n = n, mean = 0, sd = sqrt(2))
+one_exp <- rexp(n = n, rate = 1/sqrt(2))
+
+S1_pois_b <- rep(NA, n.sims)
+S1_binom_b <- rep(NA, n.sims)
+S1_norm_b <- rep(NA, n.sims)
+S1_exp_b <- rep(NA, n.sims)
+
+S2_pois_b <- rep(NA, n.sims)
+S2_binom_b <- rep(NA, n.sims)
+S2_norm_b <- rep(NA, n.sims)
+S2_exp_b <- rep(NA, n.sims)
+
+for(i in 1:n.sims){
+  # sample with replacement from the one sample
+  curr.sample <- sample(one_pois, size = n, replace = TRUE)
+  x_bar <- mean(curr.sample)
+  S1_pois_b[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_pois_b[i] <- sum((curr.sample - x_bar)^2) / n
+
+  curr.sample <- sample(one_binom, size = n, replace = TRUE)
+  x_bar <- mean(curr.sample)
+  S1_binom_b[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_binom_b[i] <- sum((curr.sample - x_bar)^2) / n
+
+  curr.sample <- sample(one_norm, size = n, replace = TRUE)
+  x_bar <- mean(curr.sample)
+  S1_norm_b[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_norm_b[i] <- sum((curr.sample - x_bar)^2) / n
+
+  curr.sample <- sample(one_exp, size = n, replace = TRUE)
+  x_bar <- mean(curr.sample)
+  S1_exp_b[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_exp_b[i] <- sum((curr.sample - x_bar)^2) / n
+}
+
+raw_b <- tibble(
+  Estimator = rep(c("S1", "S2"), each = 1000, times = 4),
+  Distribution = rep(c("Poisson", "Binomial", "Normal", "Exponential"), each = 2000),
+  Estimate = c(S1_pois_b, S2_pois_b, S1_binom_b, S2_binom_b,
+                   S1_norm_b, S2_norm_b, S1_exp_b, S2_exp_b)
+)
+
+ggplot(raw_b) +
+  geom_density(aes(x = Estimate, color = Estimator)) +
+  ggtitle("Bootstrap density of S1 vs S2 (seed = 7272)") +
+  facet_wrap(~ Distribution, scales = "free") +
+  theme_bw()
+
+```
+
+```{r}
+set.seed(100)
+
+one_pois <- rpois(n = n, lambda = 2)
+one_binom <- rbinom(n = n, size = 50, prob = p)
+one_norm <- rnorm(n = n, mean = 0, sd = sqrt(2))
+one_exp <- rexp(n = n, rate = 1/sqrt(2))
+
+S1_pois_b <- rep(NA, n.sims)
+S1_binom_b <- rep(NA, n.sims)
+S1_norm_b <- rep(NA, n.sims)
+S1_exp_b <- rep(NA, n.sims)
+
+S2_pois_b <- rep(NA, n.sims)
+S2_binom_b <- rep(NA, n.sims)
+S2_norm_b <- rep(NA, n.sims)
+S2_exp_b <- rep(NA, n.sims)
+
+for(i in 1:n.sims){
+  curr.sample <- sample(one_pois, size = n, replace = TRUE)
+  x_bar <- mean(curr.sample)
+  S1_pois_b[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_pois_b[i] <- sum((curr.sample - x_bar)^2) / n
+
+  curr.sample <- sample(one_binom, size = n, replace = TRUE)
+  x_bar <- mean(curr.sample)
+  S1_binom_b[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_binom_b[i] <- sum((curr.sample - x_bar)^2) / n
+
+  curr.sample <- sample(one_norm, size = n, replace = TRUE)
+  x_bar <- mean(curr.sample)
+  S1_norm_b[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_norm_b[i] <- sum((curr.sample - x_bar)^2) / n
+
+  curr.sample <- sample(one_exp, size = n, replace = TRUE)
+  x_bar <- mean(curr.sample)
+  S1_exp_b[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_exp_b[i] <- sum((curr.sample - x_bar)^2) / n
+}
+
+raw_b <- tibble(
+  Estimator = rep(c("S1", "S2"), each = 1000, times = 4),
+  Distribution = rep(c("Poisson", "Binomial", "Normal", "Exponential"), each = 2000),
+  Estimate = c(S1_pois_b, S2_pois_b, S1_binom_b, S2_binom_b,
+                   S1_norm_b, S2_norm_b, S1_exp_b, S2_exp_b)
+)
+
+ggplot(raw_b) +
+  geom_density(aes(x = Estimate, color = Estimator)) +
+  ggtitle("Bootstrap density of S1 vs S2 (seed = 100)") +
+  facet_wrap(~ Distribution, scales = "free") +
+  theme_bw()
+```
+
+```{r}
+set.seed(10000)
+
+one_pois <- rpois(n = n, lambda = 2)
+one_binom <- rbinom(n = n, size = 50, prob = p)
+one_norm <- rnorm(n = n, mean = 0, sd = sqrt(2))
+one_exp <- rexp(n = n, rate = 1/sqrt(2))
+
+S1_pois_b <- rep(NA, n.sims)
+S1_binom_b <- rep(NA, n.sims)
+S1_norm_b <- rep(NA, n.sims)
+S1_exp_b <- rep(NA, n.sims)
+
+S2_pois_b <- rep(NA, n.sims)
+S2_binom_b <- rep(NA, n.sims)
+S2_norm_b <- rep(NA, n.sims)
+S2_exp_b <- rep(NA, n.sims)
+
+for(i in 1:n.sims){
+  curr.sample <- sample(one_pois, size = n, replace = TRUE)
+  x_bar <- mean(curr.sample)
+  S1_pois_b[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_pois_b[i] <- sum((curr.sample - x_bar)^2) / n
+
+  curr.sample <- sample(one_binom, size = n, replace = TRUE)
+  x_bar <- mean(curr.sample)
+  S1_binom_b[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_binom_b[i] <- sum((curr.sample - x_bar)^2) / n
+
+  curr.sample <- sample(one_norm, size = n, replace = TRUE)
+  x_bar <- mean(curr.sample)
+  S1_norm_b[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_norm_b[i] <- sum((curr.sample - x_bar)^2) / n
+
+  curr.sample <- sample(one_exp, size = n, replace = TRUE)
+  x_bar <- mean(curr.sample)
+  S1_exp_b[i] <- sum((curr.sample - x_bar)^2) / (n - 1)
+  S2_exp_b[i] <- sum((curr.sample - x_bar)^2) / n
+}
+
+raw_b <- tibble(
+  Estimator = rep(c("S1", "S2"), each = 1000, times = 4),
+  Distribution = rep(c("Poisson", "Binomial", "Normal", "Exponential"), each = 2000),
+  Estimate = c(S1_pois_b, S2_pois_b, S1_binom_b, S2_binom_b,
+                   S1_norm_b, S2_norm_b, S1_exp_b, S2_exp_b)
+)
+
+ggplot(raw_b) +
+  geom_density(aes(x = Estimate, color = Estimator)) +
+  ggtitle("Bootstrap density of S1 vs S2 (seed = 10000)") +
+  facet_wrap(~ Distribution, scales = "free") +
+  theme_bw()
+```
 
 # Executive Summary
 Summarize the work you've done here to provide a brief (200-300 word) summary of the simulation and the results using your work in Lab 11. Your summary should be professional, clear, and all claims should be corroborated with statistical support.
