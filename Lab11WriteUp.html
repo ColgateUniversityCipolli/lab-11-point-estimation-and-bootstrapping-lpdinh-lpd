@@ -168,7 +168,7 @@ window.Quarto = {
 \textrm{Mean Square Error} &amp;= \textrm{Bias}^2 + \textrm{Variance of Estimates}.
 \end{align*}\]</span></p>
 <p><strong>Solution</strong></p>
-<p>There is not enough evidence that <span class="math inline">\(S_{n-1}^2\)</span> is a better estimator than <span class="math inline">\(S_n^2\)</span> because across all distributions, on average (across 1000 simulations), <span class="math inline">\(S_{n-1}^2\)</span> has lower bias compared to <span class="math inline">\(S_n^2\)</span>, but also lower precision.</p>
+<p>There is not enough evidence that <span class="math inline">\(S_{n-1}^2\)</span> is a better estimator than <span class="math inline">\(S_n^2\)</span> because across all distributions, on average (across 1000 simulations), <span class="math inline">\(S_{n-1}^2\)</span> has lower bias compared to <span class="math inline">\(S_n^2\)</span>, but also lower precision (higher variance) and lower (MSE).</p>
 <p></p>
 <div class="cell">
 <details class="code-fold">
@@ -1128,9 +1128,10 @@ window.Quarto = {
 <h2 data-number="2.4" class="anchored" data-anchor-id="bootstrap"><span class="header-section-number">2.4</span> Bootstrap</h2>
 <p>Now, take <em>one</em> sample from each distribution. Instead of drawing a random sample at each iteration, sample <em>with replacement</em> from the one sample. Produce a density plot of the <span class="math inline">\(s_{n-1}^2\)</span> and <span class="math inline">\(s_{n}^2\)</span>. Do we get roughly the same information as we do in the full simulation? Try this over several seeds – what do you notice? Ensure to set your randomization seed.</p>
 <p><strong>Solution</strong></p>
-<p>When we conduct bootstrap sampling, the distributions of S1 and S2 resemble a Gaussian distribution even when sample size is small (n=20), except for the Exponential Distribution. When we resample from 1 sample drawn from the Exponential Distribution, the density curves of S1 and S2 at n=20 is trimodal. The variability of the density curves don’t change as significantly as sample size increases compared to when we did full simulation; however, we observe the same trend of curve for S1 and the curve for S1 converges as sample size increases and almost completely overlap at n=500.</p>
+<p>When we conduct bootstrap sampling, the distributions of S1 and S2 resemble a Gaussian distribution even when sample size is small (n=20) and are generally less right-skewed, except for the Exponential Distribution. When we resample from 1 sample drawn from the Exponential Distribution, the density curves of S1 and S2 at n=20 is trimodal, except for when seed=10. The variability of the density curves don’t change as significantly as sample size increases compared to when we did full simulation; however, we observe the same trend of curve for S1 and the curve for S1 converging as sample size increases and almost completely overlap at n=500.</p>
 <p>When we did full simulation, all density curves center around the true variance, which is 2. However, in bootstrap sampling, even at n=500, the curves of S1 and S2 for 1000 bootstrap samples of 1 random sample from all distributions (except for Exponential) don’t center around 2</p>
-<p>When we change seeds, the shapes of the distributions</p>
+<p>When we change seeds, the shapes of the distributions largely remain the same, but their expected values shift significantly, especially when seed=10 and sample size is smaller than 100. In this case, across all distributions, the curves of both S1 and S2 center around 1.5, which is far off from the true variance. When n=20, for the Poisson and Binomial distributions, they center around values less than 1.</p>
+<p><code>set.seed</code> ensures one gets the same randomizatinon, so changing it will produce a different randomization. Perhaps when I set it to 10, it produced random samples with variance that is really off from the true variance.</p>
 <ul>
 <li>Poisson</li>
 </ul>
@@ -1739,6 +1740,15 @@ window.Quarto = {
 <section id="executive-summary" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Executive Summary</h1>
 <p>Summarize the work you’ve done here to provide a brief (200-300 word) summary of the simulation and the results using your work in Lab 11. Your summary should be professional, clear, and all claims should be corroborated with statistical support.</p>
+<p>When performing point estimation, we sometimes caculate sample variance as <span class="math display">\[S1 = S_{n-1}^2 = \frac{1}{n-1} \sum_{i=1}^n (X_i -\bar{X})^2,\]</span> and sometimes as <span class="math display">\[S2 = S_n^2 = \frac{1}{n} \sum_{i=1}^n (X_i -\bar{X})^2.\]</span>.</p>
+<p>This lab compares the two estimators across 1000 simulations drawn from different distributions and across different sample sizes. At small sample size, n=20, across all distributions:</p>
+<ul>
+<li><p>S1 shows lower bias but lower precision and higher MSE than S2.</p></li>
+<li><p>The distributions of S1 and S2 have long right tails, i.e., many high-value outliers, especially for the Exponential Distribution.</p></li>
+</ul>
+<p>As sample size increases, the average bias and variance decreases substantially for both S1 and S2. Their precision becomes 5-6 times higher as the sample size increases from 100 to 500. S1 still has lower bias and lower precision than S2 overall, but their MSE converges at n=100 and n=500. This indicates that when sample size is large enough, S1 and S2 are equally good estimators. Their density curves overlap increases and almost completely overlap at n=500, and become closer to the Gaussian Distribution as sample size increases.</p>
+<p>Except for the Exponential Distribution, when n=500, the bias and variance of S1 across all other distributions are 0 and 0.02, respectively. This means that S1 provides estimates very close to the true variance on average, when n=500.</p>
+<p>In bootstrap simulations, the distributions of S1 and S2 have less variability and approximate the Gaussian Distribution regardless of sample size, except for the Exponential Distribution. However, while in the full simulation, estimator distributions center around the true variance (<span class="math inline">\(\sigma=2\)</span>), this is not necessarily the case for bootstrap sampling. This is because the one sample that we’re resampling from with replacement still have less variability compared to drawing samples repeatedly from a distribution. However, as sample size increases, meaning we’re more likely to capture the true variance with our one sample, the average value of the distributions of estimators approach 2.</p>
 </section>
 
 </main>
