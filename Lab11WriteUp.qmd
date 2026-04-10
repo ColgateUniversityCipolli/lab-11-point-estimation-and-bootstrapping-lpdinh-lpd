@@ -107,8 +107,7 @@ Create a plot or combination of plots (using patchwork) to show the results acro
 
 **Solution**
 
-There is not enough evidence that $S_{n-1}^2$ is a better estimator than $S_n^2$ because across all distributions, on average (across 1000 simulations), $S_{n-1}^2$ has lower bias compared to $S_n^2$, but also lower precision.
-
+There is not enough evidence that $S_{n-1}^2$ is a better estimator than $S_n^2$ because across all distributions, on average (across 1000 simulations), $S_{n-1}^2$ has lower bias compared to $S_n^2$, but also lower precision. 
 
 ```{r}
 set.seed(7272)
@@ -241,7 +240,8 @@ results <- tibble(
 
 ```{r}
 #| echo: false
-results |> knitr::kable(digits = 2)
+results |> knitr::kable(digits = 2,
+                  caption = "S1 and S2 across 1000 simulations")
 ```
 
 ## Simulation over various sample sizes
@@ -306,9 +306,6 @@ results_pois <- tibble(
   Precision = 1 / Variance,
   MSE = Bias^2 + Variance)
 
-# table
-results_pois |> knitr::kable(digits = 2)
-
 # plot
 p_pois2 = ggplot(raw_pois) +
   geom_boxplot(aes(x = Estimator,
@@ -370,9 +367,6 @@ results_binom <- tibble(
   Precision = 1 / Variance,
   MSE = Bias^2 + Variance)
 
-# table
-results_binom |> knitr::kable(digits = 2)
-
 # plot
 p_binom2 = ggplot(raw_binom) +
   geom_boxplot(aes(x = Estimator,
@@ -432,9 +426,6 @@ results_norm <- tibble(
   ),
   Precision = 1 / Variance,
   MSE = Bias^2 + Variance)
-
-# table
-results_norm |> knitr::kable(digits = 2)
 
 # plot
 p_norm2 = ggplot(raw_norm) +
@@ -496,9 +487,6 @@ results_exp <- tibble(
   Precision = 1 / Variance,
   MSE = Bias^2 + Variance)
 
-# table
-results_exp |> knitr::kable(digits = 2)
-
 # plot
 p_exp2 = ggplot(raw_exp) +
   geom_boxplot(aes(x = Estimator,
@@ -507,6 +495,18 @@ p_exp2 = ggplot(raw_exp) +
   ggtitle("") +
   theme(axis.ticks.x = element_blank()) +
   facet_wrap(~ n) 
+```
+
+```{r}
+#| echo: false
+results_pois |> knitr::kable(digits = 2,
+                            caption = "S1 and S2 across 1000 simulations for Poisson Distribution")
+results_binom |> knitr::kable(digits = 2,
+                              caption = "S1 and S2 across 1000 simulations for Binomial Distribution")
+results_norm |> knitr::kable(digits = 2,
+                            caption = "S1 and S2 across 1000 simulations for Normal Distribution")
+results_exp |> knitr::kable(digits = 2,
+                            caption = "S1 and S2 across 1000 simulations for Exponential Distribution")
 ```
 
 ```{r}
@@ -615,7 +615,11 @@ Now, take *one* sample from each distribution. Instead of drawing a random sampl
 
 **Solution**
 
-The distributions of S1 and S2 across distributions resemble a Gaussian distribution, even when the sample size is small. They do become more
+When we conduct bootstrap sampling, the distributions of S1 and S2 resemble a Gaussian distribution even when sample size is small (n=20) and are generally less right-skewed, except for the Exponential Distribution. When we resample from 1 sample drawn from the Exponential Distribution, the density curves of S1 and S2 at n=20 is trimodal, except for when seed=10. The variability of the density curves don't change as significantly as sample size increases compared to when we did full simulation; however, we observe the same trend of curve for S1 and the curve for S1 converging as sample size increases and almost completely overlap at n=500.
+
+When we did full simulation, all density curves center around the true variance, which is 2. However, in bootstrap sampling, even at n=500, the curves of S1 and S2 for 1000 bootstrap samples of 1 random sample from all distributions (except for Exponential) don't center around 2
+
+When we change seeds, the shapes of the distributions
 
 * Poisson
 
@@ -786,16 +790,6 @@ p_exp = ggplot(raw_b_exp) +
 
 ```
 
-```{r}
-#| fig.width: 10
-#| fig.height: 8
-#| out.width: "100%"
-
-(p_pois + p_binom) / (p_norm + p_exp) +
-  plot_annotation(title = "Bootstrap Density of S1 vs S2 across Distributions (seed=7272)") +
-  plot_layout(guides = "collect")
-```
-
 * Trying this with seed = 10
 
 ```{r}
@@ -831,10 +825,10 @@ raw_b_pois <- tibble(
                S1_pois_b[["500"]], S2_pois_b[["500"]])
 )
 
-ggplot(raw_b_pois) +
+p_pois10 = ggplot(raw_b_pois) +
   geom_density_ridges(aes(x = Estimate, y = 0, color = Estimator), fill = NA) +
   geom_hline(yintercept = 0) +
-  ggtitle("Bootstrap Density of S1 vs S2 - Poisson (seed=10)") +
+  ggtitle("Poisson") +
   facet_wrap(~ n, scales = "free") +
   ylab("Density") + 
   theme_bw()
@@ -871,10 +865,10 @@ raw_b_binom <- tibble(
                S1_binom_b[["500"]], S2_binom_b[["500"]])
 )
 
-ggplot(raw_b_binom) +
+p_binom10 = ggplot(raw_b_binom) +
   geom_density_ridges(aes(x = Estimate, y = 0, color = Estimator), fill = NA) +
   geom_hline(yintercept = 0) +
-  ggtitle("Bootstrap Density of S1 vs S2 - Binomial (seed=10)") +
+  ggtitle("Binomial") +
   facet_wrap(~ n, scales = "free") +
   ylab("Density") + 
   theme_bw()
@@ -911,10 +905,10 @@ raw_b_norm <- tibble(
                S1_norm_b[["500"]], S2_norm_b[["500"]])
 )
 
-ggplot(raw_b_norm) +
+p_norm10 = ggplot(raw_b_norm) +
   geom_density_ridges(aes(x = Estimate, y = 0, color = Estimator), fill = NA) +
   geom_hline(yintercept = 0) +
-  ggtitle("Bootstrap Density of S1 vs S2 - Normal (seed=10)") +
+  ggtitle("Normal") +
   facet_wrap(~ n, scales = "free") +
   ylab("Density") + 
   theme_bw()
@@ -951,10 +945,10 @@ raw_b_exp <- tibble(
                S1_exp_b[["500"]], S2_exp_b[["500"]])
 )
 
-ggplot(raw_b_exp) +
+p_exp10 = ggplot(raw_b_exp) +
   geom_density_ridges(aes(x = Estimate, y = 0, color = Estimator), fill = NA) +
   geom_hline(yintercept = 0) +
-  ggtitle("Bootstrap Density of S1 vs S2 - Exponential (seed=10)") +
+  ggtitle("Exponential") +
   facet_wrap(~ n, scales = "free") +
   ylab("Density") + 
   theme_bw()
@@ -996,10 +990,10 @@ raw_b_pois <- tibble(
                S1_pois_b[["500"]], S2_pois_b[["500"]])
 )
 
-ggplot(raw_b_pois) +
+p_pois99 = ggplot(raw_b_pois) +
   geom_density_ridges(aes(x = Estimate, y = 0, color = Estimator), fill = NA) +
   geom_hline(yintercept = 0) +
-  ggtitle("Bootstrap Density of S1 vs S2 - Poisson (seed=9999)") +
+  ggtitle("Poisson") +
   facet_wrap(~ n, scales = "free") +
   ylab("Density") + 
   theme_bw()
@@ -1036,10 +1030,10 @@ raw_b_binom <- tibble(
                S1_binom_b[["500"]], S2_binom_b[["500"]])
 )
 
-ggplot(raw_b_binom) +
+p_binom99 = ggplot(raw_b_binom) +
   geom_density_ridges(aes(x = Estimate, y = 0, color = Estimator), fill = NA) +
   geom_hline(yintercept = 0) +
-  ggtitle("Bootstrap Density of S1 vs S2 - Binomial (seed=9999)") +
+  ggtitle("Binomial") +
   facet_wrap(~ n, scales = "free") +
   ylab("Density") + 
   theme_bw()
@@ -1076,10 +1070,10 @@ raw_b_norm <- tibble(
                S1_norm_b[["500"]], S2_norm_b[["500"]])
 )
 
-ggplot(raw_b_norm) +
+p_norm99 = ggplot(raw_b_norm) +
   geom_density_ridges(aes(x = Estimate, y = 0, color = Estimator), fill = NA) +
   geom_hline(yintercept = 0) +
-  ggtitle("Bootstrap Density of S1 vs S2 - Normal (seed=9999)") +
+  ggtitle("Normal") +
   facet_wrap(~ n, scales = "free") +
   ylab("Density") + 
   theme_bw()
@@ -1116,14 +1110,41 @@ raw_b_exp <- tibble(
                S1_exp_b[["500"]], S2_exp_b[["500"]])
 )
 
-ggplot(raw_b_exp) +
+p_exp99 = ggplot(raw_b_exp) +
   geom_density_ridges(aes(x = Estimate, y = 0, color = Estimator), fill = NA) +
   geom_hline(yintercept = 0) +
-  ggtitle("Bootstrap Density of S1 vs S2 - Exponential (seed=9999)") +
+  ggtitle("Exponential") +
   facet_wrap(~ n, scales = "free") +
   ylab("Density") + 
   theme_bw()
 
+```
+```{r}
+#| fig.width: 10
+#| fig.height: 8
+#| out.width: "100%"
+
+(p_pois + p_binom) / (p_norm + p_exp) +
+  plot_annotation(title = "Bootstrap Density of S1 vs S2 across Sample Sizes and Distributions (seed=7272)") +
+  plot_layout(guides = "collect")
+```
+```{r}
+#| fig.width: 10
+#| fig.height: 8
+#| out.width: "100%"
+
+(p_pois10 + p_binom10) / (p_norm10 + p_exp10) +
+  plot_annotation(title = "Bootstrap Density of S1 vs S2 across Sample Sizes and Distributions (seed=10)") +
+  plot_layout(guides = "collect")
+```
+```{r}
+#| fig.width: 10
+#| fig.height: 8
+#| out.width: "100%"
+
+(p_pois99 + p_binom99) / (p_norm99 + p_exp99) +
+  plot_annotation(title = "Bootstrap Density of S1 vs S2 across Sample Sizes and Distributions (seed=99999)") +
+  plot_layout(guides = "collect")
 ```
 
 # Executive Summary
