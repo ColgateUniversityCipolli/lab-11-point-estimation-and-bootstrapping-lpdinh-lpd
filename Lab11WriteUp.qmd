@@ -107,7 +107,7 @@ Create a plot or combination of plots (using patchwork) to show the results acro
 
 **Solution**
 
-There is not enough evidence that $S_{n-1}^2$ is a better estimator than $S_n^2$ because across all distributions, on average (across 1000 simulations), $S_{n-1}^2$ has lower bias compared to $S_n^2$, but also lower precision. 
+There is not enough evidence that $S_{n-1}^2$ is a better estimator than $S_n^2$ because across all distributions, on average (across 1000 simulations), $S_{n-1}^2$ has lower bias compared to $S_n^2$, but also lower precision (higher variance) and lower (MSE). 
 
 ```{r}
 set.seed(7272)
@@ -619,7 +619,9 @@ When we conduct bootstrap sampling, the distributions of S1 and S2 resemble a Ga
 
 When we did full simulation, all density curves center around the true variance, which is 2. However, in bootstrap sampling, even at n=500, the curves of S1 and S2 for 1000 bootstrap samples of 1 random sample from all distributions (except for Exponential) don't center around 2
 
-When we change seeds, the shapes of the distributions
+When we change seeds, the shapes of the distributions largely remain the same, but their expected values shift significantly, especially when seed=10 and sample size is smaller than 100. In this case, across all distributions, the curves of both S1 and S2 center around 1.5, which is far off from the true variance. When n=20, for the Poisson and Binomial distributions, they center around values less than 1. 
+
+`set.seed` ensures one gets the same randomizatinon, so changing it will produce a different randomization. Perhaps when I set it to 10, it produced random samples with variance that is really off from the true variance.
 
 * Poisson
 
@@ -1149,3 +1151,20 @@ p_exp99 = ggplot(raw_b_exp) +
 
 # Executive Summary
 Summarize the work you've done here to provide a brief (200-300 word) summary of the simulation and the results using your work in Lab 11. Your summary should be professional, clear, and all claims should be corroborated with statistical support.
+
+When performing point estimation, we sometimes caculate sample variance as 
+$$S1 = S_{n-1}^2 = \frac{1}{n-1} \sum_{i=1}^n (X_i -\bar{X})^2,$$
+and sometimes as
+$$S2 = S_n^2 = \frac{1}{n} \sum_{i=1}^n (X_i -\bar{X})^2.$$.
+
+This lab compares the two estimators across 1000 simulations drawn from different distributions and across different sample sizes. At small sample size, n=20, across all distributions:
+
+* S1 shows lower bias but lower precision and higher MSE than S2. 
+
+* The distributions of S1 and S2 have long right tails, i.e., many high-value outliers, especially for the Exponential Distribution.
+
+As sample size increases, the average bias and variance decreases substantially for both S1 and S2. Their precision becomes 5-6 times higher as the sample size increases from 100 to 500. S1 still has lower bias and lower precision than S2 overall, but their MSE converges at n=100 and n=500. This indicates that when sample size is large enough, S1 and S2 are equally good estimators. Their density curves overlap increases and almost completely overlap at n=500, and become closer to the Gaussian Distribution as sample size increases.
+
+Except for the Exponential Distribution, when n=500, the bias and variance of S1 across all other distributions are 0 and 0.02, respectively. This means that S1 provides estimates very close to the true variance on average, when n=500.
+
+In bootstrap simulations, the distributions of S1 and S2 have less variability and approximate the Gaussian Distribution regardless of sample size, except for the Exponential Distribution. However, while in the full simulation, estimator distributions center around the true variance ($\sigma=2$), this is not necessarily the case for bootstrap sampling. This is because the one sample that we're resampling from with replacement still have less variability compared to drawing samples repeatedly from a distribution. However, as sample size increases, meaning we're more likely to capture the true variance with our one sample, the average value of the distributions of estimators approach 2.
