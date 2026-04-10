@@ -517,9 +517,150 @@ ggplot(raw_exp) +
 ## Simulation
 You have written code to draw a random sample of various sizes from each distribution, and to calculate and store the calculated estimates. Rework your code to produce a density plot of the $s_{n-1}^2$ and $s_{n}^2$. Do you have a guess about their distribution? Ensure to set your randomization seed. 
 
+```{r}
+# n20.s1 <- tibble(
+#   Poisson = raw_pois[raw_pois[raw_pois$n == "n=20" & raw_pois$Estimator == "S1"]],
+#   Binomial = raw_binom[raw_binom[raw_binom$n == "n=20" & raw_binom$Estimator == "S1"]],
+# )
+
+set.seed(7272)
+# library(ggridges) can't find it
+
+# raw_all <- bind_rows(
+#   raw_pois |> mutate(Distribution = "Poisson"),
+#   raw_binom |> mutate(Distribution = "Binomial"),
+#   raw_norm |> mutate(Distribution = "Normal"),
+#   raw_exp |> mutate(Distribution = "Exponential")
+# )
+
+# # S1
+# raw_all |>
+#   filter(Estimator == "S1") |>
+#   ggplot(aes(x=Estimate, color = Distribution)) +
+#   geom_density() +
+#   facet_wrap(~ n) +
+#   xlab("Estimate") +
+#   ylab("Density") +
+#   ggtitle("Sampling Distribution of S1 across sample sizes and distributions")
+
+# # S2 
+# raw_all |>
+#   filter(Estimator == "S2") |>
+#   ggplot(aes(x=Estimate, color = Distribution)) +
+#   geom_density() +
+#   facet_wrap(~ n) +
+#   xlab("Estimate") +
+#   ylab("Density") +
+#   ggtitle("Sampling Distribution of S2 across sample sizes and distributions")
+
+# poisson
+# raw_pois |>
+#       filter(Estimator == "S1") |>
+#       ggplot(aes(x=Estimate, color = n)) +
+#       geom_density() +
+#       xlab("S1") +
+#       ylab("Density") +
+#       ggtitle("Poisson")
+
+# raw_pois |>
+#       filter(Estimator == "S2") |>
+#       ggplot(aes(x=Estimate, color = n)) +
+#       geom_density() +
+#       xlab("S2") +
+#       ylab("Density") +
+#       ggtitle("Poisson")
+
+# # binomial
+
+# raw_binom |>
+#       filter(Estimator == "S1") |>
+#       ggplot(aes(x=Estimate, color = n)) +
+#       geom_density() +
+#       xlab("S1") +
+#       ylab("Density") +
+#       ggtitle("Binomial")
+
+# raw_binom |>
+#       filter(Estimator == "S2") |>
+#       ggplot(aes(x=Estimate, color = n)) +
+#       geom_density() +
+#       xlab("Estimate") +
+#       ylab("Density") +
+#       ggtitle("Binomial")
+
+# # normal
+
+# raw_norm|>
+#       filter(Estimator == "S1") |>
+#       ggplot(aes(x=Estimate, color = n)) +
+#       geom_density() +
+#       xlab("Estimate") +
+#       ylab("Density") +
+#       ggtitle("Sampling Distribution of S1 of Normal Distribution across sample sizes")
+
+# raw_norm |>
+#       filter(Estimator == "S2") |>
+#       ggplot(aes(x=Estimate, color = n)) +
+#       geom_density() +
+#       xlab("Estimate") +
+#       ylab("Density") +
+#       ggtitle("Sampling Distribution of S2 of Normal Distribution across sample sizes")
+
+# # exponential
+
+# raw_exp |>
+#       filter(Estimator == "S1") |>
+#       ggplot(aes(x=Estimate, color = n)) +
+#       geom_density() +
+#       xlab("Estimate") +
+#       ylab("Density") +
+#       ggtitle("Sampling Distribution of S1 of Exponential Distribution across sample sizes")
+
+# raw_exp |>
+#       filter(Estimator == "S2") |>
+#       ggplot(aes(x=Estimate, color = n)) +
+#       geom_density() +
+#       xlab("Estimate") +
+#       ylab("Density") +
+#       ggtitle("Sampling Distribution of S2 of Exponential Distribution across sample sizes")
+
+# poisson
+ggplot(raw_pois) +
+  geom_density(aes(x = Estimate, color = Estimator)) +
+  ggtitle("Density of S1 vs S2 - Poisson") +
+  facet_wrap(~ n, scales = "free") +
+  # lets each facet panel have its own x and y axes instead of forcing them to share the same range
+  ylab("Density") +
+  theme_bw()
+
+# binomial
+ggplot(raw_pois) +
+  geom_density(aes(x = Estimate, color = Estimator)) +
+  ggtitle("Density of S1 vs S2 - Binomial") +
+  facet_wrap(~ n, scales = "free") +
+  ylab("Density") +
+  theme_bw()
+
+# normal
+ggplot(raw_pois) +
+  geom_density(aes(x = Estimate, color = Estimator)) +
+  ggtitle("Density of S1 vs S2 - Normal") +
+  facet_wrap(~ n, scales = "free") +
+  ylab("Density") +
+  theme_bw()
+
+# Exponential
+ggplot(raw_pois) +
+  geom_density(aes(x = Estimate, color = Estimator)) +
+  ggtitle("Density of S1 vs S2 - Exponential") +
+  facet_wrap(~ n, scales = "free") +
+  ylab("Density") +
+  theme_bw()
+```
+
+
 ## Bootstrap
 Now, take *one* sample from each distribution. Instead of drawing a random sample at each iteration, sample *with replacement* from the one sample. Produce a density plot of the $s_{n-1}^2$ and $s_{n}^2$. Do we get roughly the same information as we do in the full simulation? Try this over several seeds -- what do you notice? Ensure to set your randomization seed.
-
 
 # Executive Summary
 Summarize the work you've done here to provide a brief (200-300 word) summary of the simulation and the results using your work in Lab 11. Your summary should be professional, clear, and all claims should be corroborated with statistical support.
