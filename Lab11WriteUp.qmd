@@ -185,13 +185,13 @@ ggplot(raw) +
 #   Distribution = c("Poisson", "Binomial", "Normal", "Exponential"),
 #   Bias = c(
 #     mean(S1_pois) - 2,
-#     mean(S1_bin) - 2,
+#     mean(S1_binom) - 2,
 #     mean(S1_norm) - 2,
 #     mean(S1_exp) - 2
 #   ),
 #   Variance = c(
 #     var(S1_pois),
-#     var(S1_bin),
+#     var(S1_binom),
 #     var(S1_norm),
 #     var(S1_exp)
 #   ),
@@ -214,13 +214,13 @@ results <- tibble(
   Estimator = rep(c("S1", "S2"), times = 4),
   Bias = c(
     mean(S1_pois) - 2, mean(S2_pois) - 2,
-    mean(S1_bin)  - 2, mean(S2_bin)  - 2,
+    mean(S1_binom)  - 2, mean(S2_binom)  - 2,
     mean(S1_norm) - 2, mean(S2_norm) - 2,
     mean(S1_exp)  - 2, mean(S2_exp)  - 2
   ),
   Variance = c(
     var(S1_pois), var(S2_pois),
-    var(S1_bin),  var(S2_bin),
+    var(S1_binom),  var(S2_binom),
     var(S1_norm), var(S2_norm),
     var(S1_exp),  var(S2_exp)
   ),
@@ -634,7 +634,7 @@ ggplot(raw_pois) +
   theme_bw()
 
 # binomial
-ggplot(raw_pois) +
+ggplot(raw_binom) +
   geom_density(aes(x = Estimate, color = Estimator)) +
   ggtitle("Density of S1 vs S2 - Binomial") +
   facet_wrap(~ n, scales = "free") +
@@ -642,7 +642,7 @@ ggplot(raw_pois) +
   theme_bw()
 
 # normal
-ggplot(raw_pois) +
+ggplot(raw_norm) +
   geom_density(aes(x = Estimate, color = Estimator)) +
   ggtitle("Density of S1 vs S2 - Normal") +
   facet_wrap(~ n, scales = "free") +
@@ -650,7 +650,7 @@ ggplot(raw_pois) +
   theme_bw()
 
 # Exponential
-ggplot(raw_pois) +
+ggplot(raw_exp) +
   geom_density(aes(x = Estimate, color = Estimator)) +
   ggtitle("Density of S1 vs S2 - Exponential") +
   facet_wrap(~ n, scales = "free") +
