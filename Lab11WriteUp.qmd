@@ -234,16 +234,6 @@ results <- tibble(
 #   geom_col() +
 #   facet_wrap(~ Distribution) +
 #   labs(title = "Bias")
-
-# ggplot(results, aes(x = Estimator, y = Precision, fill = Estimator)) +
-#   geom_col() +
-#   facet_wrap(~ Distribution) +
-#   labs(title = "Precision")
-
-# ggplot(results, aes(x = Estimator, y = MSE, fill = Estimator)) +
-#   geom_col() +
-#   facet_wrap(~ Distribution) +
-#   labs(title = "MSE")
 ```
 
 ```{r}
@@ -517,6 +507,9 @@ ggplot(raw_exp) +
 ## Simulation
 You have written code to draw a random sample of various sizes from each distribution, and to calculate and store the calculated estimates. Rework your code to produce a density plot of the $s_{n-1}^2$ and $s_{n}^2$. Do you have a guess about their distribution? Ensure to set your randomization seed. 
 
+**Solution**
+Based on the boxplots, their distributions become less right-skewed and less variable as sample size increases. When n=500, the distributions of S1 and S2 are approximately Gaussian.
+
 ```{r}
 # n20.s1 <- tibble(
 #   Poisson = raw_pois[raw_pois[raw_pois$n == "n=20" & raw_pois$Estimator == "S1"]],
@@ -524,7 +517,7 @@ You have written code to draw a random sample of various sizes from each distrib
 # )
 
 set.seed(7272)
-# library(ggridges) can't find it
+library(ggridges)
 
 # raw_all <- bind_rows(
 #   raw_pois |> mutate(Distribution = "Poisson"),
@@ -543,16 +536,6 @@ set.seed(7272)
 #   ylab("Density") +
 #   ggtitle("Sampling Distribution of S1 across sample sizes and distributions")
 
-# # S2 
-# raw_all |>
-#   filter(Estimator == "S2") |>
-#   ggplot(aes(x=Estimate, color = Distribution)) +
-#   geom_density() +
-#   facet_wrap(~ n) +
-#   xlab("Estimate") +
-#   ylab("Density") +
-#   ggtitle("Sampling Distribution of S2 across sample sizes and distributions")
-
 # poisson
 # raw_pois |>
 #       filter(Estimator == "S1") |>
@@ -562,80 +545,21 @@ set.seed(7272)
 #       ylab("Density") +
 #       ggtitle("Poisson")
 
-# raw_pois |>
-#       filter(Estimator == "S2") |>
-#       ggplot(aes(x=Estimate, color = n)) +
-#       geom_density() +
-#       xlab("S2") +
-#       ylab("Density") +
-#       ggtitle("Poisson")
-
-# # binomial
-
-# raw_binom |>
-#       filter(Estimator == "S1") |>
-#       ggplot(aes(x=Estimate, color = n)) +
-#       geom_density() +
-#       xlab("S1") +
-#       ylab("Density") +
-#       ggtitle("Binomial")
-
-# raw_binom |>
-#       filter(Estimator == "S2") |>
-#       ggplot(aes(x=Estimate, color = n)) +
-#       geom_density() +
-#       xlab("Estimate") +
-#       ylab("Density") +
-#       ggtitle("Binomial")
-
-# # normal
-
-# raw_norm|>
-#       filter(Estimator == "S1") |>
-#       ggplot(aes(x=Estimate, color = n)) +
-#       geom_density() +
-#       xlab("Estimate") +
-#       ylab("Density") +
-#       ggtitle("Sampling Distribution of S1 of Normal Distribution across sample sizes")
-
-# raw_norm |>
-#       filter(Estimator == "S2") |>
-#       ggplot(aes(x=Estimate, color = n)) +
-#       geom_density() +
-#       xlab("Estimate") +
-#       ylab("Density") +
-#       ggtitle("Sampling Distribution of S2 of Normal Distribution across sample sizes")
-
-# # exponential
-
-# raw_exp |>
-#       filter(Estimator == "S1") |>
-#       ggplot(aes(x=Estimate, color = n)) +
-#       geom_density() +
-#       xlab("Estimate") +
-#       ylab("Density") +
-#       ggtitle("Sampling Distribution of S1 of Exponential Distribution across sample sizes")
-
-# raw_exp |>
-#       filter(Estimator == "S2") |>
-#       ggplot(aes(x=Estimate, color = n)) +
-#       geom_density() +
-#       xlab("Estimate") +
-#       ylab("Density") +
-#       ggtitle("Sampling Distribution of S2 of Exponential Distribution across sample sizes")
-
 # poisson
+
 ggplot(raw_pois) +
-  geom_density(aes(x = Estimate, color = Estimator)) +
+  geom_density_ridges(aes(x = Estimate, y=0, color=`Estimator`), fill=NA) +
+  geom_hline(yintercept = 0) +
   ggtitle("Density of S1 vs S2 - Poisson") +
-  facet_wrap(~ n, scales = "free") +
   # lets each facet panel have its own x and y axes instead of forcing them to share the same range
+  facet_wrap(~ n, scales = "free") +
   ylab("Density") +
   theme_bw()
-
+  
 # binomial
 ggplot(raw_binom) +
-  geom_density(aes(x = Estimate, color = Estimator)) +
+  geom_density_ridges(aes(x = Estimate, y=0, color=`Estimator`), fill=NA) +
+  geom_hline(yintercept = 0) +
   ggtitle("Density of S1 vs S2 - Binomial") +
   facet_wrap(~ n, scales = "free") +
   ylab("Density") +
@@ -643,7 +567,8 @@ ggplot(raw_binom) +
 
 # normal
 ggplot(raw_norm) +
-  geom_density(aes(x = Estimate, color = Estimator)) +
+  geom_density_ridges(aes(x = Estimate, y=0, color=`Estimator`), fill=NA) +
+  geom_hline(yintercept = 0) +
   ggtitle("Density of S1 vs S2 - Normal") +
   facet_wrap(~ n, scales = "free") +
   ylab("Density") +
@@ -651,7 +576,8 @@ ggplot(raw_norm) +
 
 # Exponential
 ggplot(raw_exp) +
-  geom_density(aes(x = Estimate, color = Estimator)) +
+  geom_density_ridges(aes(x = Estimate, y=0, color=`Estimator`), fill=NA) +
+  geom_hline(yintercept = 0) +
   ggtitle("Density of S1 vs S2 - Exponential") +
   facet_wrap(~ n, scales = "free") +
   ylab("Density") +
@@ -671,14 +597,17 @@ one_norm <- rnorm(n = n, mean = 0, sd = sqrt(2))
 one_exp <- rexp(n = n, rate = 1/sqrt(2))
 
 S1_pois_b <- rep(NA, n.sims)
+S2_pois_b <- rep(NA, n.sims)
+
 S1_binom_b <- rep(NA, n.sims)
+S2_binom_b <- rep(NA, n.sims)
+
 S1_norm_b <- rep(NA, n.sims)
+S2_norm_b <- rep(NA, n.sims)
+
+S2_exp_b <- rep(NA, n.sims)
 S1_exp_b <- rep(NA, n.sims)
 
-S2_pois_b <- rep(NA, n.sims)
-S2_binom_b <- rep(NA, n.sims)
-S2_norm_b <- rep(NA, n.sims)
-S2_exp_b <- rep(NA, n.sims)
 
 for(i in 1:n.sims){
   # sample with replacement from the one sample
@@ -707,19 +636,21 @@ raw_b <- tibble(
   Estimator = rep(c("S1", "S2"), each = 1000, times = 4),
   Distribution = rep(c("Poisson", "Binomial", "Normal", "Exponential"), each = 2000),
   Estimate = c(S1_pois_b, S2_pois_b, S1_binom_b, S2_binom_b,
-                   S1_norm_b, S2_norm_b, S1_exp_b, S2_exp_b)
+               S1_norm_b, S2_norm_b, S1_exp_b, S2_exp_b)
 )
 
 ggplot(raw_b) +
-  geom_density(aes(x = Estimate, color = Estimator)) +
+  geom_density_ridges(aes(x = Estimate, y=0, color=`Estimator`), fill=NA) +
+  geom_hline(yintercept = 0) +
   ggtitle("Bootstrap density of S1 vs S2 (seed = 7272)") +
   facet_wrap(~ Distribution, scales = "free") +
+  ylab("Density") +
   theme_bw()
 
 ```
 
 ```{r}
-set.seed(100)
+set.seed(10)
 
 one_pois <- rpois(n = n, lambda = 2)
 one_binom <- rbinom(n = n, size = 50, prob = p)
@@ -762,18 +693,20 @@ raw_b <- tibble(
   Estimator = rep(c("S1", "S2"), each = 1000, times = 4),
   Distribution = rep(c("Poisson", "Binomial", "Normal", "Exponential"), each = 2000),
   Estimate = c(S1_pois_b, S2_pois_b, S1_binom_b, S2_binom_b,
-                   S1_norm_b, S2_norm_b, S1_exp_b, S2_exp_b)
+              S1_norm_b, S2_norm_b, S1_exp_b, S2_exp_b)
 )
 
 ggplot(raw_b) +
-  geom_density(aes(x = Estimate, color = Estimator)) +
-  ggtitle("Bootstrap density of S1 vs S2 (seed = 100)") +
+  geom_density_ridges(aes(x = Estimate, y=0, color=`Estimator`), fill=NA) +
+  geom_hline(yintercept = 0) +
+  ggtitle("Bootstrap density of S1 vs S2 (seed = 10)") +
   facet_wrap(~ Distribution, scales = "free") +
+  ylab("Density") +
   theme_bw()
 ```
 
 ```{r}
-set.seed(10000)
+set.seed(99999)
 
 one_pois <- rpois(n = n, lambda = 2)
 one_binom <- rbinom(n = n, size = 50, prob = p)
@@ -816,13 +749,15 @@ raw_b <- tibble(
   Estimator = rep(c("S1", "S2"), each = 1000, times = 4),
   Distribution = rep(c("Poisson", "Binomial", "Normal", "Exponential"), each = 2000),
   Estimate = c(S1_pois_b, S2_pois_b, S1_binom_b, S2_binom_b,
-                   S1_norm_b, S2_norm_b, S1_exp_b, S2_exp_b)
+              S1_norm_b, S2_norm_b, S1_exp_b, S2_exp_b)
 )
 
 ggplot(raw_b) +
-  geom_density(aes(x = Estimate, color = Estimator)) +
-  ggtitle("Bootstrap density of S1 vs S2 (seed = 10000)") +
+  geom_density_ridges(aes(x = Estimate, y=0, color=`Estimator`), fill=NA) +
+  geom_hline(yintercept = 0) +
+  ggtitle("Bootstrap density of S1 vs S2 (seed = 99999)") +
   facet_wrap(~ Distribution, scales = "free") +
+  ylab("Density") +
   theme_bw()
 ```
 
