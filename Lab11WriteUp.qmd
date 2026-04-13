@@ -546,8 +546,7 @@ results_exp |> knitr::kable(digits = 2)
 #| fig-align: "center"
 #| size: scriptsize
 
-(p_pois2 + p_binom2) / (p_norm2 + p_exp2) +
-  plot_layout(guides = "collect")
+(p_pois2 + p_binom2) / (p_norm2 + p_exp2)
 ```
 
 ## Simulation
@@ -641,8 +640,7 @@ p_exp1 = ggplot(raw_exp) +
 #| fig-align: "center"
 #| size: scriptsize
 
-(p_pois1 + p_binom1) / (p_norm1 + p_exp1) +
-  plot_layout(guides = "collect")
+(p_pois1 + p_binom1) / (p_norm1 + p_exp1)
 ```
 
 ## Bootstrap
@@ -1164,8 +1162,7 @@ p_exp99 = ggplot(raw_b_exp) +
 #| scale: "80%"
 #| fig-align: "center"
 #| size: scriptsize 
-(p_pois + p_binom) / (p_norm + p_exp) +
-  plot_layout(guides = "collect")
+(p_pois + p_binom) / (p_norm + p_exp)
 ```
 ```{r}
 #| label: fig-box-estimateb1
@@ -1175,8 +1172,7 @@ p_exp99 = ggplot(raw_b_exp) +
 #| scale: "80%"
 #| fig-align: "center"
 #| size: scriptsize 
-(p_pois10 + p_binom10) / (p_norm10 + p_exp10) +
-  plot_layout(guides = "collect")
+(p_pois10 + p_binom10) / (p_norm10 + p_exp10) 
 ```
 ```{r}
 #| label: fig-box-estimateb2
@@ -1186,8 +1182,7 @@ p_exp99 = ggplot(raw_b_exp) +
 #| scale: "80%"
 #| fig-align: "center"
 #| size: scriptsize 
-(p_pois99 + p_binom99) / (p_norm99 + p_exp99) +
-  plot_layout(guides = "collect")
+(p_pois99 + p_binom99) / (p_norm99 + p_exp99) 
 ```
 
 # Executive Summary
