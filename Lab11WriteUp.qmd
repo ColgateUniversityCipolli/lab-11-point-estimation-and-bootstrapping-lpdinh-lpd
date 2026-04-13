@@ -172,17 +172,25 @@ raw <- tibble(
   Estimate=c(S1_pois, S2_pois, S1_binom, S2_binom, 
               S1_norm, S2_norm, S1_exp, S2_exp)
 )
-
+```
+```{r}
+#| label: fig-box-estimate
+#| fig-cap: "S1 vs S2 from 1000 simulations for different distributions"
+#| fig-width: 14
+#| fig-height: 10
+#| scale: "80%"
+#| fig-align: "center"
+#| size: scriptsize
 ggplot(raw) +
   geom_boxplot(aes(x = Estimator,
                    y= Estimate),
                width = 0.1) +
-  ggtitle("S1 vs S2 from 1000 simulations for different distributions") +
   theme(axis.ticks.x = element_blank()) +
   facet_wrap(~ Distribution) 
 ```
 
 ```{r}
+# saving these codes for future reference about different ways i approached the problem
 # results.S1 <- tibble(
 #   Distribution = c("Poisson", "Binomial", "Normal", "Exponential"),
 #   Bias = c(
@@ -239,9 +247,11 @@ results <- tibble(
 ```
 
 ```{r}
-#| echo: false
-results |> knitr::kable(digits = 2,
-                  caption = "S1 and S2 across 1000 simulations")
+#| label: tbl-estimate
+#| tbl-cap: "S1 and S2 across 1000 simulations."
+#| tbl-align: "center"
+#| size: scriptsize
+results |> knitr::kable(digits = 2)
 ```
 
 ## Simulation over various sample sizes
@@ -498,24 +508,45 @@ p_exp2 = ggplot(raw_exp) +
 ```
 
 ```{r}
-#| echo: false
-results_pois |> knitr::kable(digits = 2,
-                            caption = "S1 and S2 across 1000 simulations for Poisson Distribution")
-results_binom |> knitr::kable(digits = 2,
-                              caption = "S1 and S2 across 1000 simulations for Binomial Distribution")
-results_norm |> knitr::kable(digits = 2,
-                            caption = "S1 and S2 across 1000 simulations for Normal Distribution")
-results_exp |> knitr::kable(digits = 2,
-                            caption = "S1 and S2 across 1000 simulations for Exponential Distribution")
+#| label: tbl-estimatep
+#| tbl-cap: "S1 and S2 across 1000 simulations for Poisson Distribution"
+#| tbl-align: "center"
+#| size: scriptsize
+results_pois |> knitr::kable(digits = 2)
+```
+```{r}
+#| label: tbl-estimateb
+#| tbl-cap: "S1 and S2 across 1000 simulations for Binomial Distribution"
+#| tbl-align: "center"
+#| size: scriptsize
+results_binom |> knitr::kable(digits = 2)
+```
+```{r}
+#| label: tbl-estimaten
+#| tbl-cap: "S1 and S2 across 1000 simulations for Normal Distribution"
+#| tbl-align: "center"
+#| size: scriptsize
+results_norm |> knitr::kable(digits = 2)
 ```
 
 ```{r}
-#| fig.width: 10
-#| fig.height: 8
-#| out.width: "100%"
+#| label: tbl-estimatee
+#| tbl-cap: "S1 and S2 across 1000 simulations for Exponential Distribution"
+#| tbl-align: "center"
+#| size: scriptsize
+results_exp |> knitr::kable(digits = 2)
+```
+
+```{r}
+#| label: fig-box-estimate1
+#| fig-cap: "S1 vs S2 from 1000 simulations across Sample Sizes and Distributions"
+#| fig-width: 14
+#| fig-height: 10
+#| scale: "80%"
+#| fig-align: "center"
+#| size: scriptsize
 
 (p_pois2 + p_binom2) / (p_norm2 + p_exp2) +
-  plot_annotation(title = "S1 vs S2 from 1000 simulations across Sample Sizes and Distributions") +
   plot_layout(guides = "collect")
 ```
 
@@ -535,6 +566,7 @@ Based on the boxplots, their distributions become less right-skewed and have low
 set.seed(7272)
 library(ggridges)
 
+# recording initial thought process
 # raw_all <- bind_rows(
 #   raw_pois |> mutate(Distribution = "Poisson"),
 #   raw_binom |> mutate(Distribution = "Binomial"),
@@ -601,12 +633,15 @@ p_exp1 = ggplot(raw_exp) +
 ```
 
 ```{r}
-#| fig.width: 10
-#| fig.height: 8
-#| out.width: "100%"
+#| label: fig-box-estimate2
+#| fig-cap: "Density of S1 vs S2 across Sample Sizes and Distributions"
+#| fig-width: 14
+#| fig-height: 10
+#| scale: "80%"
+#| fig-align: "center"
+#| size: scriptsize
 
 (p_pois1 + p_binom1) / (p_norm1 + p_exp1) +
-  plot_annotation(title = "Density of S1 vs S2 across Sample Sizes and Distributions") +
   plot_layout(guides = "collect")
 ```
 
@@ -1122,35 +1157,43 @@ p_exp99 = ggplot(raw_b_exp) +
 
 ```
 ```{r}
-#| fig.width: 10
-#| fig.height: 8
-#| out.width: "100%"
-
+#| label: fig-box-estimateb
+#| fig-cap: "Bootstrap Density of S1 vs S2 across Sample Sizes and Distributions (seed=7272)"
+#| fig-width: 14
+#| fig-height: 10
+#| scale: "80%"
+#| fig-align: "center"
+#| size: scriptsize 
 (p_pois + p_binom) / (p_norm + p_exp) +
-  plot_annotation(title = "Bootstrap Density of S1 vs S2 across Sample Sizes and Distributions (seed=7272)") +
   plot_layout(guides = "collect")
 ```
 ```{r}
-#| fig.width: 10
-#| fig.height: 8
-#| out.width: "100%"
-
+#| label: fig-box-estimateb1
+#| fig-cap: "Bootstrap Density of S1 vs S2 across Sample Sizes and Distributions (seed=10)"
+#| fig-width: 14
+#| fig-height: 10
+#| scale: "80%"
+#| fig-align: "center"
+#| size: scriptsize 
 (p_pois10 + p_binom10) / (p_norm10 + p_exp10) +
-  plot_annotation(title = "Bootstrap Density of S1 vs S2 across Sample Sizes and Distributions (seed=10)") +
   plot_layout(guides = "collect")
 ```
 ```{r}
-#| fig.width: 10
-#| fig.height: 8
-#| out.width: "100%"
-
+#| label: fig-box-estimateb2
+#| fig-cap: "Bootstrap Density of S1 vs S2 across Sample Sizes and Distributions (seed=99999)"
+#| fig-width: 14
+#| fig-height: 10
+#| scale: "80%"
+#| fig-align: "center"
+#| size: scriptsize 
 (p_pois99 + p_binom99) / (p_norm99 + p_exp99) +
-  plot_annotation(title = "Bootstrap Density of S1 vs S2 across Sample Sizes and Distributions (seed=99999)") +
   plot_layout(guides = "collect")
 ```
 
 # Executive Summary
 Summarize the work you've done here to provide a brief (200-300 word) summary of the simulation and the results using your work in Lab 11. Your summary should be professional, clear, and all claims should be corroborated with statistical support.
+
+**Solution**
 
 When performing point estimation, we sometimes caculate sample variance as 
 $$S1 = S_{n-1}^2 = \frac{1}{n-1} \sum_{i=1}^n (X_i -\bar{X})^2,$$
@@ -1159,12 +1202,12 @@ $$S2 = S_n^2 = \frac{1}{n} \sum_{i=1}^n (X_i -\bar{X})^2.$$.
 
 This lab compares the two estimators across 1000 simulations drawn from different distributions and across different sample sizes. At small sample size, n=20, across all distributions:
 
-* S1 shows lower bias but lower precision and higher MSE than S2. 
+* As seen in @tbl-estimate, S1 shows lower bias but lower precision and higher MSE than S2. 
 
-* The distributions of S1 and S2 have long right tails, i.e., many high-value outliers, especially for the Exponential Distribution.
+* As seen in @fig-box-estimate, the distributions of S1 and S2 have long right tails, i.e., many high-value outliers, especially for the Exponential Distribution.
 
-As sample size increases, the average bias and variance decreases substantially for both S1 and S2. Their precision becomes 5-6 times higher as the sample size increases from 100 to 500. S1 still has lower bias and lower precision than S2 overall, but their MSE converges at n=100 and n=500. This indicates that when sample size is large enough, S1 and S2 are equally good estimators. Their density curves overlap increases and almost completely overlap at n=500, and become closer to the Gaussian Distribution as sample size increases.
+According to @tbl-estimateb, @tbl-estimatee, @tbl-estimaten and @tbl-estimatep, for all distributions, the average bias and variance decreases substantially for both S1 and S2 as sample size increases. Their precision becomes 5-6 times higher as the sample size increases from 100 to 500. S1 still has lower bias and lower precision than S2 overall, but their MSE converges at n=100 and n=500. This indicates that when sample size is large enough, S1 and S2 are equally good estimators. As shown in @fig-box-estimate2, their density curves overlap increases and almost completely overlap at n=500, and become closer to the Gaussian Distribution as sample size increases.
 
-Except for the Exponential Distribution, when n=500, the bias and variance of S1 across all other distributions are 0 and 0.02, respectively. This means that S1 provides estimates very close to the true variance on average, when n=500.
+Except for the Exponential Distribution, when n=500, the bias and variance of S1 across all other distributions are 0 and 0.02, respectively. This means that S1 provides estimates very close to the true variance on average, when n=500. 
 
-In bootstrap simulations, the distributions of S1 and S2 have less variability and approximate the Gaussian Distribution regardless of sample size, except for the Exponential Distribution. However, while in the full simulation, estimator distributions center around the true variance ($\sigma=2$), this is not necessarily the case for bootstrap sampling. This is because the one sample that we're resampling from with replacement still have less variability compared to drawing samples repeatedly from a distribution. However, as sample size increases, meaning we're more likely to capture the true variance with our one sample, the average value of the distributions of estimators approach 2.
+In bootstrap simulations, the distributions of S1 and S2 have less variability and approximate the Gaussian Distribution regardless of sample size, except for the Exponential Distribution, as demonstrated in @fig-box-estimateb. However, while in the full simulation, estimator distributions center around the true variance ($\sigma=2$), this is not necessarily the case for bootstrap sampling. This is because the one sample that we're resampling from with replacement still have less variability compared to drawing samples repeatedly from a distribution. However, as sample size increases, meaning we're more likely to capture the true variance with our one sample, the average value of the distributions of estimators approach 2.
